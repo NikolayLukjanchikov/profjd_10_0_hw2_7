@@ -1,5 +1,7 @@
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmployeeBook {
     //- **Очень сложно**
@@ -17,27 +19,28 @@ public class EmployeeBook {
     //        +2. Изменить отдел.
     //        Придумать архитектуру. Сделать или два метода, или один, но продумать его.
     //    6. +Получить Ф. И. О. всех сотрудников по отделам (напечатать список отделов и их сотрудников).
-    private Employee[] employees = new Employee[10];
+    private Map<Integer, Employee> employees = new HashMap<>();
 
     public void addNewEmployee(Employee newEmployee) {
-        boolean isEmployeeNotInBook = true;
-        for (int i = 0; i < employees.length; i++) {
-            if (employees[i] != null) {
-                if (employees[i].equals(newEmployee)) {
-                    System.out.println("Такой сотрудник " + employees[i] + " уже есть в базе");
-                    isEmployeeNotInBook = false;
-                }
-            } else if (isEmployeeNotInBook) {
-                employees[i] = newEmployee;
-                break;
-            }
+        if (employees.containsValue(newEmployee)) {
+            System.out.println("Такой сотрудник уже добавлен");
+        } else {
+            employees.putIfAbsent(newEmployee.getId(), newEmployee);
         }
     }
 
-    public void deleteEmployee(String fullNameEmployeeToDelete, int id) {
-        for (int i = 0; i < employees.length; i++) {
-            if ((employees[i] != null) && ((employees[i].getFio().equals(fullNameEmployeeToDelete))) && (employees[i].getId() == id)) {
-                employees[i] = null;
+    public void deleteEmployee(String employeeFioToDelete, int id) {
+        if (employees.containsKey(id)) {
+            employees.remove(id);
+        } else {
+            try {
+                for (Map.Entry<Integer, Employee> employeesBook : employees.entrySet()) {
+                    if (employeesBook.getValue().getFio().equals(employeeFioToDelete)) {
+                        employees.remove(employeesBook.getKey());
+                    }
+                }
+            } catch (NullPointerException e) {
+                System.out.println("Нет такого сотрудника");
             }
         }
     }
